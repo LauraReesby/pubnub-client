@@ -1,0 +1,7 @@
+
+{
+  "secretKey": "sec-c-MjRmZTUwZmQtZDQzZS00OTEyLTk3NzEtNDJjMjYxMzM3N2Vh",
+	"subscribeKey": "sub-c-cf51f244-5c9d-11e8-94f8-7233e189f8a9",
+	"publishKey": "pub-c-978ce18a-9ae7-4c27-9874-9462e17a9137",
+  "channels": ["cactuspi"]
+}
