@@ -1,0 +1,14 @@
+
+{
+  "ledMatrix": {
+    "path": "~/rpi-rgb-led-matrix",
+    "options": {
+      "ledGpioMapping": "adafruit-hat",
+      "ledNoHardwarePulse": true,
+      "ledRows": 32,
+      "ledChain": 2,
+      "ledSlowdownGpio": 2,
+      "ledPwmBits": 6
+    }
+  }
+}

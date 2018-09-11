@@ -1,0 +1,7 @@
+
+{
+  "secretKey": "sec-c-something",
+	"subscribeKey": "sub-c-something",
+	"publishKey": "pub-c-something",
+  "channels": ["cactuspi"]
+}
