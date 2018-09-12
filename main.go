@@ -15,8 +15,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/disintegration/imaging"
 	"github.com/golang/freetype"
 	"github.com/golang/freetype/truetype"
+	"github.com/mcuadros/go-rpi-rgb-led-matrix"
 	pubnub "github.com/pubnub/go"
 )
 
