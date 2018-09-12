@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"image"
 	"image/color"
@@ -12,6 +13,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/golang/freetype"
 	"github.com/golang/freetype/truetype"
@@ -32,7 +34,20 @@ var (
 	white            = color.RGBA{255, 255, 255, 255}
 	black            = color.RGBA{0, 0, 0, 255}
 	background       *image.RGBA
-	pn               *pubnub.PubNub
+
+	rows                     = flag.Int("led-rows", 32, "number of rows supported")
+	cols                     = flag.Int("led-cols", 32, "number of columns supported")
+	parallel                 = flag.Int("led-parallel", 1, "number of daisy-chained panels")
+	chain                    = flag.Int("led-chain", 1, "number of displays daisy-chained")
+	show_refresh             = flag.Bool("led-show-refresh", false, "Show refresh rate.")
+	inverse_colors           = flag.Bool("led-inverse", false, "Switch if your matrix has inverse colors on.")
+	disable_hardware_pulsing = flag.Bool("led-no-hardware-pulse", true, "Don't use hardware pin-pulse generation.")
+	brightness               = flag.Int("brightness", 30, "brightness (0-100)")
+	hardware_mapping         = flag.String("led-gpio-mapping", "adafruit-hat", "Name of GPIO mapping used.")
+	img                      = flag.String("image", "utf8text.png", "image path")
+	rotate                   = flag.Int("rotate", 0, "rotate angle, 90, 180, 270")
+
+	pn *pubnub.PubNub
 )
 
 func init() {
@@ -69,6 +84,7 @@ func main() {
 					msg := message.Message.(string)
 					s := strings.Split(msg, "\n")
 					CreateTextImage(s)
+					DisplayImage()
 				case "weather":
 					fmt.Println("weather")
 				}
@@ -179,4 +195,52 @@ func CreateTextImage(subwayText []string) bool {
 	fmt.Println("Save to utf8text.png")
 
 	return true
+}
+
+func DisplayImage() {
+	f, err := os.Open(*img)
+	fatal(err)
+
+	config := &rgbmatrix.DefaultConfig
+	config.Rows = *rows
+	config.Cols = *cols
+	config.Parallel = *parallel
+	config.ChainLength = *chain
+	config.ShowRefreshRate = *show_refresh
+	config.InverseColors = *inverse_colors
+	config.DisableHardwarePulsing = *disable_hardware_pulsing
+	config.Brightness = *brightness
+	config.HardwareMapping = *hardware_mapping
+
+	m, err := rgbmatrix.NewRGBLedMatrix(config)
+	fatal(err)
+
+	tk := rgbmatrix.NewToolKit(m)
+	defer tk.Close()
+
+	switch *rotate {
+	case 90:
+		tk.Transform = imaging.Rotate90
+	case 180:
+		tk.Transform = imaging.Rotate180
+	case 270:
+		tk.Transform = imaging.Rotate270
+	}
+
+	duration_Minute := 2 * time.Minute
+
+	loadedImage, err := png.Decode(f)
+
+	err = tk.PlayImage(loadedImage, duration_Minute)
+	fatal(err)
+}
+
+func init() {
+	flag.Parse()
+}
+
+func fatal(err error) {
+	if err != nil {
+		panic(err)
+	}
 }
