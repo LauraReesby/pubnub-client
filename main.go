@@ -25,7 +25,7 @@ import (
 var (
 	backgroundWidth  = 64
 	backgroundHeight = 32
-	utf8FontFile     = "SUBWT___.ttf"
+	utf8FontFile     = "Agane_55.ttf"
 	utf8FontSize     = float64(12.0)
 	spacing          = float64(1)
 	dpi              = float64(72)
