@@ -70,7 +70,6 @@ func init() {
 func main() {
 	listener := pubnub.NewListener()
 	forever := make(chan bool)
-	chanTime := make(chan time.Time)
 
 	go func() {
 		for {
@@ -85,7 +84,9 @@ func main() {
 			case message := <-listener.Message:
 				fmt.Println(message.Message)
 
-				chanTime <- time.Now()
+				if tk != nil {
+					chanTime <- time.Now()
+				}
 				md := message.UserMetadata.(map[string]interface{})
 				msg := message.Message.(string)
 				s := strings.Split(msg, "\n")
