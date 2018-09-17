@@ -37,7 +37,7 @@ var (
 	black            = color.RGBA{0, 0, 0, 255}
 	background       *image.RGBA
 	tk               *rgbmatrix.ToolKit
-	chanTime         = make(chan time.Time) // no buffer
+	chanTime         chan time.Time
 
 	rows                     = flag.Int("led-rows", 32, "number of rows supported")
 	cols                     = flag.Int("led-cols", 32, "number of columns supported")
@@ -70,6 +70,7 @@ func init() {
 func main() {
 	listener := pubnub.NewListener()
 	forever := make(chan bool)
+	chanTime := make(chan time.Time)
 
 	go func() {
 		for {
@@ -85,7 +86,7 @@ func main() {
 				fmt.Println(message.Message)
 
 				if tk != nil {
-					chanTime <- time.Now()
+					<-chanTime
 				}
 				md := message.UserMetadata.(map[string]interface{})
 				msg := message.Message.(string)
