@@ -36,6 +36,7 @@ var (
 	white            = color.RGBA{255, 255, 255, 255}
 	black            = color.RGBA{0, 0, 0, 255}
 	background       *image.RGBA
+	tk               *rgbmatrix.ToolKit
 
 	rows                     = flag.Int("led-rows", 32, "number of rows supported")
 	cols                     = flag.Int("led-cols", 32, "number of columns supported")
@@ -68,7 +69,6 @@ func init() {
 func main() {
 	listener := pubnub.NewListener()
 	forever := make(chan bool)
-	*ToolKit toolKit := null
 
 	go func() {
 		for {
@@ -81,21 +81,22 @@ func main() {
 					fmt.Println("Unable to connect to cactuspi")
 				}
 			case message := <-listener.Message:
-				if(toolkit != null) toolkit.Close()
 				fmt.Println(message.Message)
+
+				tk.Close()
 				md := message.UserMetadata.(map[string]interface{})
 				msg := message.Message.(string)
 				s := strings.Split(msg, "\n")
 
 				switch md["name"] {
-					case "subway":
-						fmt.Println("subway")
-						CreateImage(s)
-						toolkit = DisplayImage()
-					case "weather":
-						fmt.Println("weather")
-						CreateImage(s)
-						toolkit = DisplayImage()
+				case "subway":
+					fmt.Println("subway")
+					CreateImage(s)
+					DisplayImage()
+				case "weather":
+					fmt.Println("weather")
+					CreateImage(s)
+					DisplayImage()
 				}
 			case <-listener.Presence:
 			}
@@ -206,7 +207,7 @@ func CreateImage(subwayText []string) bool {
 	return true
 }
 
-func DisplayImage() *ToolKit {
+func DisplayImage() bool {
 	f, err := os.Open(*img)
 	fatal(err)
 
@@ -224,7 +225,7 @@ func DisplayImage() *ToolKit {
 	m, err := rgbmatrix.NewRGBLedMatrix(config)
 	fatal(err)
 
-	tk := rgbmatrix.NewToolKit(m)
+	tk = rgbmatrix.NewToolKit(m)
 	defer tk.Close()
 
 	switch *rotate {
@@ -236,14 +237,14 @@ func DisplayImage() *ToolKit {
 		tk.Transform = imaging.Rotate270
 	}
 
-	duration_Minute := 90 * time.Minute
+	durationMinute := 90 * time.Minute
 
 	loadedImage, err := png.Decode(f)
 
-	err = tk.PlayImage(loadedImage, duration_Minute)
+	err = tk.PlayImage(loadedImage, durationMinute)
 	fatal(err)
 
-	return tk
+	return true
 }
 
 func fatal(err error) {
