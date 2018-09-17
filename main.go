@@ -38,20 +38,19 @@ var (
 	background       *image.RGBA
 	tk               *rgbmatrix.ToolKit
 
-	rows                     = flag.Int("led-rows", 32, "number of rows supported")
-	cols                     = flag.Int("led-cols", 32, "number of columns supported")
-	parallel                 = flag.Int("led-parallel", 1, "number of daisy-chained panels")
-	chain                    = flag.Int("led-chain", 2, "number of displays daisy-chained")
-	show_refresh             = flag.Bool("led-show-refresh", false, "Show refresh rate.")
-	inverse_colors           = flag.Bool("led-inverse", false, "Switch if your matrix has inverse colors on.")
-	disable_hardware_pulsing = flag.Bool("led-no-hardware-pulse", true, "Don't use hardware pin-pulse generation.")
-	brightness               = flag.Int("brightness", 30, "brightness (0-100)")
-	hardware_mapping         = flag.String("led-gpio-mapping", "adafruit-hat", "Name of GPIO mapping used.")
-	img                      = flag.String("image", "utf8text.png", "image path")
-	rotate                   = flag.Int("rotate", 0, "rotate angle, 90, 180, 270")
+	rows                   = flag.Int("led-rows", 32, "number of rows supported")
+	cols                   = flag.Int("led-cols", 32, "number of columns supported")
+	parallel               = flag.Int("led-parallel", 1, "number of daisy-chained panels")
+	chain                  = flag.Int("led-chain", 2, "number of displays daisy-chained")
+	showRefresh            = flag.Bool("led-show-refresh", false, "Show refresh rate.")
+	inverseColors          = flag.Bool("led-inverse", false, "Switch if your matrix has inverse colors on.")
+	disableHardwarePulsing = flag.Bool("led-no-hardware-pulse", true, "Don't use hardware pin-pulse generation.")
+	brightness             = flag.Int("brightness", 30, "brightness (0-100)")
+	hardwareMapping        = flag.String("led-gpio-mapping", "adafruit-hat", "Name of GPIO mapping used.")
+	img                    = flag.String("image", "utf8text.png", "image path")
+	rotate                 = flag.Int("rotate", 0, "rotate angle, 90, 180, 270")
 
-	pn       *pubnub.PubNub
-	chanTime <-chan time.Time
+	pn *pubnub.PubNub
 )
 
 func init() {
@@ -85,7 +84,7 @@ func main() {
 				fmt.Println(message.Message)
 
 				if tk != nil {
-					fmt.Println("tk is not nil")
+					fmt.Println("Closing open canvas")
 					tk.Close()
 				}
 				md := message.UserMetadata.(map[string]interface{})
@@ -220,16 +219,15 @@ func DisplayImage() bool {
 	config.Cols = *cols
 	config.Parallel = *parallel
 	config.ChainLength = *chain
-	config.ShowRefreshRate = *show_refresh
-	config.InverseColors = *inverse_colors
-	config.DisableHardwarePulsing = *disable_hardware_pulsing
+	config.ShowRefreshRate = *showRefresh
+	config.InverseColors = *inverseColors
+	config.DisableHardwarePulsing = *disableHardwarePulsing
+	config.HardwareMapping = *hardwareMapping
 	config.Brightness = *brightness
-	config.HardwareMapping = *hardware_mapping
 
 	m, err := rgbmatrix.NewRGBLedMatrix(config)
 	fatal(err)
 	tk = rgbmatrix.NewToolKit(m)
-	//defer tk.Close()
 
 	switch *rotate {
 	case 90:
@@ -242,7 +240,7 @@ func DisplayImage() bool {
 
 	loadedImage, err := png.Decode(f)
 
-	err = tk.PlayImage(loadedImage, (10 * time.Second))
+	err = tk.PlayImage(loadedImage, (5 * time.Second))
 	fatal(err)
 
 	return true
