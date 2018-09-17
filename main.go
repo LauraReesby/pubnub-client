@@ -240,7 +240,7 @@ func CreateWeatherImage(text []string, iconUrl string) bool {
 	UTF8text := text
 
 	// Draw the text to the background
-	pt := freetype.Pt(2, 2+int(ctx.PointToFixed(utf8FontSize)>>6))
+	pt := freetype.Pt(1, 1+int(ctx.PointToFixed(utf8FontSize)>>6))
 
 	// not all utf8 fonts are supported by wqy-zenhei.ttf
 	// use your own language true type font file if your language cannot be printed
@@ -312,7 +312,7 @@ func CreateWeatherImage(text []string, iconUrl string) bool {
 		fatal(err)
 	}
 
-	r2 := image.Rect(32, 0, backgroundWidth, backgroundHeight)
+	r2 := image.Rect(30, 0, backgroundWidth, backgroundHeight)
 	finalImg := image.NewRGBA(image.Rect(0, 0, backgroundWidth, backgroundHeight))
 	draw.Draw(finalImg, src2.Bounds(), src2, image.Point{0, 0}, draw.Src)
 	draw.Draw(finalImg, r2, dstImage128, image.Point{0, 0}, draw.Src)
