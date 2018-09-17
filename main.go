@@ -37,7 +37,6 @@ var (
 	black            = color.RGBA{0, 0, 0, 255}
 	background       *image.RGBA
 	tk               *rgbmatrix.ToolKit
-	chanTime         = make(chan time.Time)
 
 	rows                     = flag.Int("led-rows", 32, "number of rows supported")
 	cols                     = flag.Int("led-cols", 32, "number of columns supported")
@@ -51,7 +50,8 @@ var (
 	img                      = flag.String("image", "utf8text.png", "image path")
 	rotate                   = flag.Int("rotate", 0, "rotate angle, 90, 180, 270")
 
-	pn *pubnub.PubNub
+	pn       *pubnub.PubNub
+	chanTime <-chan time.Time
 )
 
 func init() {
@@ -70,6 +70,7 @@ func init() {
 func main() {
 	listener := pubnub.NewListener()
 	forever := make(chan bool)
+	chanTime := make(chan time.Time)
 
 	go func() {
 		for {
@@ -85,6 +86,7 @@ func main() {
 				fmt.Println(message.Message)
 
 				if tk != nil {
+					fmt.Println("tk is not nil")
 					chanTime <- time.Now()
 				}
 				md := message.UserMetadata.(map[string]interface{})
