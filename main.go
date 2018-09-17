@@ -297,8 +297,10 @@ func CreateWeatherImage(text []string, iconUrl string) bool {
 		fatal(err)
 	}
 	dstImage128 := imaging.Resize(src, 32, 32, imaging.Lanczos)
+	dstImage128Inv := imaging.Invert(dstImage128)
+
 	// Save the resulting image as JPEG.
-	err = imaging.Save(dstImage128, "assets/weatherIconResize.png")
+	err = imaging.Save(dstImage128Inv, "assets/weatherIconResize.png")
 	if err != nil {
 		fatal(err)
 	}
@@ -311,7 +313,7 @@ func CreateWeatherImage(text []string, iconUrl string) bool {
 	r2 := image.Rect(32, 0, backgroundWidth, backgroundHeight)
 	finalImg := image.NewRGBA(image.Rect(0, 0, backgroundWidth, backgroundHeight))
 	draw.Draw(finalImg, src2.Bounds(), src2, image.Point{0, 0}, draw.Src)
-	draw.Draw(finalImg, r2, dstImage128, image.Point{0, 0}, draw.Src)
+	draw.Draw(finalImg, r2, dstImage128Inv, image.Point{0, 0}, draw.Src)
 
 	finalFile, err := os.Create("assets/utf8text.png")
 	if err != nil {
