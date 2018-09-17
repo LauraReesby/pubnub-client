@@ -47,10 +47,12 @@ var (
 	showRefresh            = flag.Bool("led-show-refresh", false, "Show refresh rate.")
 	inverseColors          = flag.Bool("led-inverse", false, "Switch if your matrix has inverse colors on.")
 	disableHardwarePulsing = flag.Bool("led-no-hardware-pulse", true, "Don't use hardware pin-pulse generation.")
-	brightness             = flag.Int("brightness", 30, "brightness (0-100)")
+	brightness             = flag.Int("brightness", 70, "brightness (0-100)")
 	hardwareMapping        = flag.String("led-gpio-mapping", "adafruit-hat", "Name of GPIO mapping used.")
 	img                    = flag.String("image", "assets/utf8text.png", "image path")
 	rotate                 = flag.Int("rotate", 0, "rotate angle, 90, 180, 270")
+	pwmBits                = flag.Int("pwmBits", 8, "pwmBits")
+	pwmlsbNanoseconds      = flag.Int("pwmlsbNanoseconds", 100, "pwmlsbNanoseconds")
 
 	pn *pubnub.PubNub
 )
@@ -297,10 +299,10 @@ func CreateWeatherImage(text []string, iconUrl string) bool {
 		fatal(err)
 	}
 	dstImage128 := imaging.Resize(src, 32, 32, imaging.Lanczos)
-	dstImage128Inv := imaging.Invert(dstImage128)
+	// dstImage128Inv := imaging.Invert(dstImage128)
 
-	// Save the resulting image as JPEG.
-	err = imaging.Save(dstImage128Inv, "assets/weatherIconResize.png")
+	// Save the resulting image as png.
+	err = imaging.Save(dstImage128, "assets/weatherIconResize.png")
 	if err != nil {
 		fatal(err)
 	}
@@ -313,7 +315,7 @@ func CreateWeatherImage(text []string, iconUrl string) bool {
 	r2 := image.Rect(32, 0, backgroundWidth, backgroundHeight)
 	finalImg := image.NewRGBA(image.Rect(0, 0, backgroundWidth, backgroundHeight))
 	draw.Draw(finalImg, src2.Bounds(), src2, image.Point{0, 0}, draw.Src)
-	draw.Draw(finalImg, r2, dstImage128Inv, image.Point{0, 0}, draw.Src)
+	draw.Draw(finalImg, r2, dstImage128, image.Point{0, 0}, draw.Src)
 
 	finalFile, err := os.Create("assets/utf8text.png")
 	if err != nil {
@@ -350,6 +352,8 @@ func DisplayImage() bool {
 	config.DisableHardwarePulsing = *disableHardwarePulsing
 	config.HardwareMapping = *hardwareMapping
 	config.Brightness = *brightness
+	config.PWMBits = *pwmBits
+	config.PWMLSBNanoseconds = *pwmlsbNanoseconds
 
 	m, err := rgbmatrix.NewRGBLedMatrix(config)
 	fatal(err)
