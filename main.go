@@ -35,6 +35,7 @@ var (
 	utf8Font         = new(truetype.Font)
 	red              = color.RGBA{255, 0, 0, 255}
 	blue             = color.RGBA{0, 0, 255, 255}
+	green            = color.RGBA{0, 255, 0, 0}
 	white            = color.RGBA{255, 255, 255, 255}
 	black            = color.RGBA{0, 0, 0, 255}
 	textImage        *image.RGBA
@@ -98,12 +99,12 @@ func main() {
 				switch md["name"] {
 				case "subway":
 					fmt.Println("subway")
-					CreateImage(s)
-					DisplayImage()
+					CreateImage(s, md["priority"].(bool))
+					// DisplayImage()
 				case "weather":
 					fmt.Println("weather")
 					CreateWeatherImage(s, md["priority"].(string))
-					DisplayImage()
+					// DisplayImage()
 				}
 			case <-listener.Presence:
 			}
@@ -146,7 +147,7 @@ func LoadConfiguration(file string) Config {
 	return config
 }
 
-func CreateImage(subwayText []string) bool {
+func CreateImage(subwayText []string, delay bool) bool {
 	fontBytes, err := ioutil.ReadFile(utf8FontFile)
 	if err != nil {
 		fmt.Println(err)
@@ -189,7 +190,7 @@ func CreateImage(subwayText []string) bool {
 	}
 
 	// Save
-	outFile, err := os.Create("assets/utf8text.png")
+	outFile, err := os.Create("assets/textImage.png")
 	if err != nil {
 		fmt.Println(err)
 		return false
@@ -209,8 +210,46 @@ func CreateImage(subwayText []string) bool {
 		fmt.Println(err)
 		return false
 	}
-	fmt.Println("Save to assets/utf8text.png")
 
+	src, err := imaging.Open("assets/textImage.png")
+	if err != nil {
+		fatal(err)
+	}
+
+	delayImage := ""
+	if delay {
+		delayImage = "assets/red-light.png"
+	} else {
+		delayImage = "assets/green-light.png"
+	}
+	src2, err := imaging.Open(delayImage)
+	if err != nil {
+		fatal(err)
+	}
+
+	r2 := image.Rect(15, 0, backgroundWidth, backgroundHeight)
+	finalImg := image.NewRGBA(image.Rect(0, 0, backgroundWidth, backgroundHeight))
+	draw.Draw(finalImg, src2.Bounds(), src2, image.Point{0, 0}, draw.Src)
+	draw.Draw(finalImg, r2, src, image.Point{0, 0}, draw.Src)
+
+	finalFile, err := os.Create("assets/utf8text.png")
+	if err != nil {
+		fatal(err)
+	}
+	defer finalFile.Close()
+
+	buffFinal := bufio.NewWriter(finalFile)
+	err = png.Encode(buffFinal, finalImg)
+	if err != nil {
+		fatal(err)
+	}
+
+	// flush everything out to file
+	err = buffFinal.Flush()
+	if err != nil {
+		fatal(err)
+	}
+	fmt.Println("Save to assets/utf8text.png")
 	return true
 }
 
@@ -240,7 +279,7 @@ func CreateWeatherImage(text []string, iconUrl string) bool {
 	UTF8text := text
 
 	// Draw the text to the background
-	pt := freetype.Pt(1, 1+int(ctx.PointToFixed(utf8FontSize)>>6))
+	pt := freetype.Pt(1, 2+int(ctx.PointToFixed(utf8FontSize)>>6))
 
 	// not all utf8 fonts are supported by wqy-zenhei.ttf
 	// use your own language true type font file if your language cannot be printed
@@ -299,7 +338,9 @@ func CreateWeatherImage(text []string, iconUrl string) bool {
 		fatal(err)
 	}
 	dstImage128 := imaging.Resize(src, 36, 36, imaging.Lanczos)
-	// dstImage128Inv := imaging.Invert(dstImage128)
+	if strings.HasSuffix(iconUrl, "50d.png") || strings.HasSuffix(iconUrl, "50n.png") || strings.HasSuffix(iconUrl, "01n.png") {
+		dstImage128 = imaging.Invert(dstImage128)
+	}
 
 	// Save the resulting image as png.
 	err = imaging.Save(dstImage128, "assets/weatherIconResize.png")
