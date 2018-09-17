@@ -244,7 +244,7 @@ func DisplayImage() bool {
 
 	loadedImage, err := png.Decode(f)
 
-	go tk.PlayImageUntil(loadedImage, chanTime)
+	err = tk.PlayImageUntil(loadedImage, chanTime)
 	fatal(err)
 
 	return true
