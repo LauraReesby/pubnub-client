@@ -49,7 +49,7 @@ var (
 	disableHardwarePulsing = flag.Bool("led-no-hardware-pulse", true, "Don't use hardware pin-pulse generation.")
 	brightness             = flag.Int("brightness", 30, "brightness (0-100)")
 	hardwareMapping        = flag.String("led-gpio-mapping", "adafruit-hat", "Name of GPIO mapping used.")
-	img                    = flag.String("image", "utf8text.png", "image path")
+	img                    = flag.String("image", "assets/utf8text.png", "image path")
 	rotate                 = flag.Int("rotate", 0, "rotate angle, 90, 180, 270")
 
 	pn *pubnub.PubNub
