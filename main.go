@@ -87,6 +87,7 @@ func main() {
 
 				if tk != nil {
 					fmt.Println("tk is not nil")
+					tk.Close()
 					chanTime <- time.Now()
 				}
 				md := message.UserMetadata.(map[string]interface{})
@@ -231,7 +232,7 @@ func DisplayImage() bool {
 	fatal(err)
 
 	tk = rgbmatrix.NewToolKit(m)
-	defer tk.Close()
+	//defer tk.Close()
 
 	switch *rotate {
 	case 90:
@@ -244,7 +245,7 @@ func DisplayImage() bool {
 
 	loadedImage, err := png.Decode(f)
 
-	err = tk.PlayImageUntil(loadedImage, chanTime)
+	go tk.PlayImageUntil(loadedImage, chanTime)
 	fatal(err)
 
 	return true
