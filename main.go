@@ -14,6 +14,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -98,7 +99,7 @@ func main() {
 
 				switch md["name"] {
 				case "subway":
-					fmt.Println("subway")
+					fmt.Println("subway, delay: " + strconv.FormatBool(md["priority"].(bool)))
 					CreateImage(s, md["priority"].(bool))
 					DisplayImage()
 				case "weather":
@@ -217,7 +218,7 @@ func CreateImage(subwayText []string, delay bool) bool {
 	}
 
 	delayImage := ""
-	if delay {
+	if delay == true {
 		delayImage = "assets/red-light.png"
 	} else {
 		delayImage = "assets/green-light.png"
@@ -227,7 +228,7 @@ func CreateImage(subwayText []string, delay bool) bool {
 		fatal(err)
 	}
 
-	r2 := image.Rect(15, 0, backgroundWidth, backgroundHeight)
+	r2 := image.Rect(13, 0, backgroundWidth, backgroundHeight)
 	finalImg := image.NewRGBA(image.Rect(0, 0, backgroundWidth, backgroundHeight))
 	draw.Draw(finalImg, src2.Bounds(), src2, image.Point{0, 0}, draw.Src)
 	draw.Draw(finalImg, r2, src, image.Point{0, 0}, draw.Src)
