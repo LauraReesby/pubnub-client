@@ -47,12 +47,12 @@ var (
 	showRefresh            = flag.Bool("led-show-refresh", false, "Show refresh rate.")
 	inverseColors          = flag.Bool("led-inverse", false, "Switch if your matrix has inverse colors on.")
 	disableHardwarePulsing = flag.Bool("led-no-hardware-pulse", true, "Don't use hardware pin-pulse generation.")
-	brightness             = flag.Int("brightness", 70, "brightness (0-100)")
+	brightness             = flag.Int("brightness", 90, "brightness (0-100)")
 	hardwareMapping        = flag.String("led-gpio-mapping", "adafruit-hat", "Name of GPIO mapping used.")
 	img                    = flag.String("image", "assets/utf8text.png", "image path")
 	rotate                 = flag.Int("rotate", 0, "rotate angle, 90, 180, 270")
-	pwmBits                = flag.Int("pwmBits", 8, "pwmBits")
-	pwmlsbNanoseconds      = flag.Int("pwmlsbNanoseconds", 100, "pwmlsbNanoseconds")
+	pwmBits                = flag.Int("pwmBits", 5, "pwmBits")
+	pwmlsbNanoseconds      = flag.Int("pwmlsbNanoseconds", 70, "pwmlsbNanoseconds")
 
 	pn *pubnub.PubNub
 )
@@ -298,7 +298,7 @@ func CreateWeatherImage(text []string, iconUrl string) bool {
 	if err != nil {
 		fatal(err)
 	}
-	dstImage128 := imaging.Resize(src, 32, 32, imaging.Lanczos)
+	dstImage128 := imaging.Resize(src, 36, 36, imaging.Lanczos)
 	// dstImage128Inv := imaging.Invert(dstImage128)
 
 	// Save the resulting image as png.
