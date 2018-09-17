@@ -70,7 +70,6 @@ func init() {
 func main() {
 	listener := pubnub.NewListener()
 	forever := make(chan bool)
-	chanTime := make(chan time.Time)
 
 	go func() {
 		for {
@@ -88,7 +87,6 @@ func main() {
 				if tk != nil {
 					fmt.Println("tk is not nil")
 					tk.Close()
-					chanTime <- time.Now()
 				}
 				md := message.UserMetadata.(map[string]interface{})
 				msg := message.Message.(string)
@@ -230,7 +228,6 @@ func DisplayImage() bool {
 
 	m, err := rgbmatrix.NewRGBLedMatrix(config)
 	fatal(err)
-
 	tk = rgbmatrix.NewToolKit(m)
 	//defer tk.Close()
 
@@ -245,7 +242,7 @@ func DisplayImage() bool {
 
 	loadedImage, err := png.Decode(f)
 
-	go tk.PlayImageUntil(loadedImage, chanTime)
+	err = tk.PlayImage(loadedImage, (10 * time.Second))
 	fatal(err)
 
 	return true
