@@ -68,6 +68,7 @@ func init() {
 func main() {
 	listener := pubnub.NewListener()
 	forever := make(chan bool)
+	*ToolKit toolKit := null
 
 	go func() {
 		for {
@@ -80,17 +81,21 @@ func main() {
 					fmt.Println("Unable to connect to cactuspi")
 				}
 			case message := <-listener.Message:
+				if(toolkit != null) toolkit.Close()
 				fmt.Println(message.Message)
 				md := message.UserMetadata.(map[string]interface{})
+				msg := message.Message.(string)
+				s := strings.Split(msg, "\n")
+
 				switch md["name"] {
-				case "subway":
-					fmt.Println("subway")
-					msg := message.Message.(string)
-					s := strings.Split(msg, "\n")
-					CreateTextImage(s)
-					DisplayImage()
-				case "weather":
-					fmt.Println("weather")
+					case "subway":
+						fmt.Println("subway")
+						CreateImage(s)
+						toolkit = DisplayImage()
+					case "weather":
+						fmt.Println("weather")
+						CreateImage(s)
+						toolkit = DisplayImage()
 				}
 			case <-listener.Presence:
 			}
@@ -133,7 +138,7 @@ func LoadConfiguration(file string) Config {
 	return config
 }
 
-func CreateTextImage(subwayText []string) bool {
+func CreateImage(subwayText []string) bool {
 	fontBytes, err := ioutil.ReadFile(utf8FontFile)
 	if err != nil {
 		fmt.Println(err)
@@ -201,7 +206,7 @@ func CreateTextImage(subwayText []string) bool {
 	return true
 }
 
-func DisplayImage() bool {
+func DisplayImage() *ToolKit {
 	f, err := os.Open(*img)
 	fatal(err)
 
@@ -231,14 +236,14 @@ func DisplayImage() bool {
 		tk.Transform = imaging.Rotate270
 	}
 
-	duration_Minute := 2 * time.Minute
+	duration_Minute := 90 * time.Minute
 
 	loadedImage, err := png.Decode(f)
 
 	err = tk.PlayImage(loadedImage, duration_Minute)
 	fatal(err)
 
-	return true
+	return tk
 }
 
 func fatal(err error) {
