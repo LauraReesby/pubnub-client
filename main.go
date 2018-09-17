@@ -100,11 +100,11 @@ func main() {
 				case "subway":
 					fmt.Println("subway")
 					CreateImage(s, md["priority"].(bool))
-					// DisplayImage()
+					DisplayImage()
 				case "weather":
 					fmt.Println("weather")
 					CreateWeatherImage(s, md["priority"].(string))
-					// DisplayImage()
+					DisplayImage()
 				}
 			case <-listener.Presence:
 			}
