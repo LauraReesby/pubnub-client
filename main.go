@@ -83,7 +83,9 @@ func main() {
 			case message := <-listener.Message:
 				fmt.Println(message.Message)
 
-				tk.Close()
+				if tk != nil {
+					tk.Close()
+				}
 				md := message.UserMetadata.(map[string]interface{})
 				msg := message.Message.(string)
 				s := strings.Split(msg, "\n")
