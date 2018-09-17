@@ -37,6 +37,7 @@ var (
 	black            = color.RGBA{0, 0, 0, 255}
 	background       *image.RGBA
 	tk               *rgbmatrix.ToolKit
+	chanTime         = make(chan time.Time) // no buffer
 
 	rows                     = flag.Int("led-rows", 32, "number of rows supported")
 	cols                     = flag.Int("led-cols", 32, "number of columns supported")
@@ -84,7 +85,7 @@ func main() {
 				fmt.Println(message.Message)
 
 				if tk != nil {
-					tk.Close()
+					chanTime <- time.Now()
 				}
 				md := message.UserMetadata.(map[string]interface{})
 				msg := message.Message.(string)
@@ -239,11 +240,9 @@ func DisplayImage() bool {
 		tk.Transform = imaging.Rotate270
 	}
 
-	durationMinute := 90 * time.Minute
-
 	loadedImage, err := png.Decode(f)
 
-	err = tk.PlayImage(loadedImage, durationMinute)
+	err = tk.PlayImageUntil(loadedImage, chanTime)
 	fatal(err)
 
 	return true
