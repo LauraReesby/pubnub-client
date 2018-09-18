@@ -100,7 +100,7 @@ func main() {
 				switch md["name"] {
 				case "subway":
 					fmt.Println("subway, delay: " + strconv.FormatBool(md["priority"].(bool)))
-					CreateImage(s, md["priority"].(bool))
+					CreateImage(s, md["priority"].(int))
 					DisplayImage()
 				case "weather":
 					fmt.Println("weather")
@@ -148,7 +148,7 @@ func LoadConfiguration(file string) Config {
 	return config
 }
 
-func CreateImage(subwayText []string, delay bool) bool {
+func CreateImage(subwayText []string, delay int) bool {
 	fontBytes, err := ioutil.ReadFile(utf8FontFile)
 	if err != nil {
 		fmt.Println(err)
@@ -218,11 +218,14 @@ func CreateImage(subwayText []string, delay bool) bool {
 	}
 
 	delayImage := ""
-	if delay == true {
-		delayImage = "assets/red-light.png"
-	} else {
+	if delay == 1 {
 		delayImage = "assets/green-light.png"
+	} else if delay == 2 {
+		delayImage = "assets/yellow-light.png"
+	} else {
+		delayImage = "assets/red-light.png"
 	}
+
 	src2, err := imaging.Open(delayImage)
 	if err != nil {
 		fatal(err)
