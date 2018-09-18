@@ -99,8 +99,9 @@ func main() {
 
 				switch md["name"] {
 				case "subway":
-					fmt.Println("subway, delay: " + strconv.FormatBool(md["priority"].(bool)))
-					CreateImage(s, md["priority"].(int))
+					prio := int(md["priority"].(float64))
+					fmt.Println("subway, delay: " + strconv.Itoa(prio))
+					CreateImage(s, prio)
 					DisplayImage()
 				case "weather":
 					fmt.Println("weather")
