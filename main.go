@@ -415,7 +415,7 @@ func CreateCovidImage(covidText []string) bool {
 	ctx = freetype.NewContext()
 	ctx.SetDPI(dpi) //screen resolution in Dots Per Inch
 	ctx.SetFont(utf8Font)
-	ctx.SetFontSize(utf8FontSize) //font size in points
+	ctx.SetFontSize(utf8FontSizeSmall) //font size in points
 	ctx.SetClip(textImage.Bounds())
 	ctx.SetDst(textImage)
 	ctx.SetSrc(fontForeGroundColor)
@@ -426,7 +426,7 @@ func CreateCovidImage(covidText []string) bool {
 	UTF8text := textArray
 
 	// Draw the text to the background
-	pt := freetype.Pt(2, 2+int(ctx.PointToFixed(utf8FontSize)>>6))
+	pt := freetype.Pt(2, 2+int(ctx.PointToFixed(utf8FontSizeSmall)>>6))
 
 	// not all utf8 fonts are supported by wqy-zenhei.ttf
 	// use your own language true type font file if your language cannot be printed
@@ -437,7 +437,7 @@ func CreateCovidImage(covidText []string) bool {
 			fmt.Println(err)
 			return false
 		}
-		pt.Y += ctx.PointToFixed(utf8FontSize * spacing)
+		pt.Y += ctx.PointToFixed(utf8FontSizeSmall * spacing)
 	}
 
 	// Save
