@@ -26,21 +26,21 @@ import (
 )
 
 var (
-	backgroundWidth   = 64
-	backgroundHeight  = 32
-	utf8FontFile      = "assets/Agane_55.ttf"
-	utf8FontSize      = float64(12.0)
-	spacing           = float64(1)
-	dpi               = float64(72)
-	ctx               = new(freetype.Context)
-	utf8Font          = new(truetype.Font)
-	red               = color.RGBA{255, 0, 0, 255}
-	blue              = color.RGBA{0, 0, 255, 255}
-	green             = color.RGBA{0, 255, 0, 0}
-	white             = color.RGBA{255, 255, 255, 255}
-	black             = color.RGBA{0, 0, 0, 255}
-	textImage         *image.RGBA
-	tk                *rgbmatrix.ToolKit
+	backgroundWidth  = 64
+	backgroundHeight = 32
+	utf8FontFile     = "assets/Agane_55.ttf"
+	utf8FontSize     = float64(12.0)
+	spacing          = float64(1)
+	dpi              = float64(72)
+	ctx              = new(freetype.Context)
+	utf8Font         = new(truetype.Font)
+	red              = color.RGBA{255, 0, 0, 255}
+	blue             = color.RGBA{0, 0, 255, 255}
+	green            = color.RGBA{0, 255, 0, 0}
+	white            = color.RGBA{255, 255, 255, 255}
+	black            = color.RGBA{0, 0, 0, 255}
+	textImage        *image.RGBA
+	tk               *rgbmatrix.ToolKit
 
 	rows                   = flag.Int("led-rows", 32, "number of rows supported")
 	cols                   = flag.Int("led-cols", 32, "number of columns supported")
@@ -112,7 +112,7 @@ func main() {
 					s := strings.Split(msg, ",")
 					fmt.Println("covid")
 					fmt.Println(s[0], s[1], s[2], s[3])
-					CreateCovidImage([s[0], s[1]])
+					CreateCovidImage(s)
 					DisplayImage()
 				default:
 					fmt.Println("message not supported")
