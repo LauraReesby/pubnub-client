@@ -21,7 +21,7 @@ import (
 	"github.com/disintegration/imaging"
 	"github.com/golang/freetype"
 	"github.com/golang/freetype/truetype"
-	"github.com/mcuadros/go-rpi-rgb-led-matrix"
+	rgbmatrix "github.com/mcuadros/go-rpi-rgb-led-matrix"
 	pubnub "github.com/pubnub/go"
 )
 
@@ -95,18 +95,26 @@ func main() {
 				}
 				md := message.UserMetadata.(map[string]interface{})
 				msg := message.Message.(string)
-				s := strings.Split(msg, "\n")
 
 				switch md["name"] {
 				case "subway":
+					s := strings.Split(msg, "\n")
 					prio := int(md["priority"].(float64))
 					fmt.Println("subway, delay: " + strconv.Itoa(prio))
 					CreateImage(s, prio)
 					DisplayImage()
 				case "weather":
+					s := strings.Split(msg, "\n")
 					fmt.Println("weather")
 					CreateWeatherImage(s, md["priority"].(string))
 					DisplayImage()
+				case "covid":
+					s := strings.Split(msg, ",")
+					fmt.Println("covid")
+					CreateCovidImage(s)
+					DisplayImage()
+				default:
+					fmt.Println("message not supported")
 				}
 			case <-listener.Presence:
 			}
@@ -362,6 +370,112 @@ func CreateWeatherImage(text []string, iconUrl string) bool {
 	finalImg := image.NewRGBA(image.Rect(0, 0, backgroundWidth, backgroundHeight))
 	draw.Draw(finalImg, src2.Bounds(), src2, image.Point{0, 0}, draw.Src)
 	draw.Draw(finalImg, r2, dstImage128, image.Point{0, 0}, draw.Src)
+
+	finalFile, err := os.Create("assets/utf8text.png")
+	if err != nil {
+		fatal(err)
+	}
+	defer finalFile.Close()
+
+	buffFinal := bufio.NewWriter(finalFile)
+	err = png.Encode(buffFinal, finalImg)
+	if err != nil {
+		fatal(err)
+	}
+
+	// flush everything out to file
+	err = buffFinal.Flush()
+	if err != nil {
+		fatal(err)
+	}
+	fmt.Println("Save to assets/utf8text.png")
+	return true
+}
+
+func CreateCovidImage(covidText []string) bool {
+	fontBytes, err := ioutil.ReadFile(utf8FontFile)
+	if err != nil {
+		fmt.Println(err)
+		return false
+	}
+
+	utf8Font, err = freetype.ParseFont(fontBytes)
+	if err != nil {
+		fmt.Println(err)
+		return false
+	}
+
+	fontForeGroundColor, fontBackGroundColor := image.NewUniform(blue), image.NewUniform(black)
+	textImage = image.NewRGBA(image.Rect(0, 0, backgroundWidth, backgroundHeight))
+	draw.Draw(textImage, textImage.Bounds(), fontBackGroundColor, image.ZP, draw.Src)
+
+	ctx = freetype.NewContext()
+	ctx.SetDPI(dpi) //screen resolution in Dots Per Inch
+	ctx.SetFont(utf8Font)
+	ctx.SetFontSize(utf8FontSize) //font size in points
+	ctx.SetClip(textImage.Bounds())
+	ctx.SetDst(textImage)
+	ctx.SetSrc(fontForeGroundColor)
+
+	var textArray [3]string
+	textArray[0] = "    NY    US"
+	textArray[0] = "New  " + covidText[1] + "  " + covidText[0]
+	textArray[0] = "All  " + covidText[3] + "  " + covidText[2]
+	UTF8text := textArray
+
+	// Draw the text to the background
+	pt := freetype.Pt(2, 2+int(ctx.PointToFixed(utf8FontSize)>>6))
+
+	// not all utf8 fonts are supported by wqy-zenhei.ttf
+	// use your own language true type font file if your language cannot be printed
+
+	for _, str := range UTF8text {
+		_, err := ctx.DrawString(str, pt)
+		if err != nil {
+			fmt.Println(err)
+			return false
+		}
+		pt.Y += ctx.PointToFixed(utf8FontSize * spacing)
+	}
+
+	// Save
+	outFile, err := os.Create("assets/textImage.png")
+	if err != nil {
+		fmt.Println(err)
+		return false
+	}
+	defer outFile.Close()
+	buff := bufio.NewWriter(outFile)
+
+	err = png.Encode(buff, textImage)
+	if err != nil {
+		fmt.Println(err)
+		return false
+	}
+
+	// flush everything out to file
+	err = buff.Flush()
+	if err != nil {
+		fmt.Println(err)
+		return false
+	}
+
+	src, err := imaging.Open("assets/textImage.png")
+	if err != nil {
+		fatal(err)
+	}
+
+	delayImage := "assets/thermometer.png"
+
+	src2, err := imaging.Open(delayImage)
+	if err != nil {
+		fatal(err)
+	}
+
+	r2 := image.Rect(12, 0, backgroundWidth, backgroundHeight)
+	finalImg := image.NewRGBA(image.Rect(0, 0, backgroundWidth, backgroundHeight))
+	draw.Draw(finalImg, src2.Bounds(), src2, image.Point{0, 0}, draw.Src)
+	draw.Draw(finalImg, r2, src, image.Point{0, 0}, draw.Src)
 
 	finalFile, err := os.Create("assets/utf8text.png")
 	if err != nil {
