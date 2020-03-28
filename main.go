@@ -30,7 +30,6 @@ var (
 	backgroundHeight  = 32
 	utf8FontFile      = "assets/Agane_55.ttf"
 	utf8FontSize      = float64(12.0)
-	utf8FontSizeSmall = float64(10.0)
 	spacing           = float64(1)
 	dpi               = float64(72)
 	ctx               = new(freetype.Context)
@@ -113,7 +112,7 @@ func main() {
 					s := strings.Split(msg, ",")
 					fmt.Println("covid")
 					fmt.Println(s[0], s[1], s[2], s[3])
-					CreateCovidImage(s)
+					CreateCovidImage([s[0], s[1]])
 					DisplayImage()
 				default:
 					fmt.Println("message not supported")
@@ -415,19 +414,18 @@ func CreateCovidImage(covidText []string) bool {
 	ctx = freetype.NewContext()
 	ctx.SetDPI(dpi) //screen resolution in Dots Per Inch
 	ctx.SetFont(utf8Font)
-	ctx.SetFontSize(utf8FontSizeSmall) //font size in points
+	ctx.SetFontSize(utf8FontSize) //font size in points
 	ctx.SetClip(textImage.Bounds())
 	ctx.SetDst(textImage)
 	ctx.SetSrc(fontForeGroundColor)
 
-	var textArray [3]string
-	textArray[0] = "    NY    US"
-	textArray[1] = "New  " + covidText[1] + "  " + covidText[0]
-	textArray[2] = "All  " + covidText[3] + "  " + covidText[2]
+	var textArray [2]string
+	textArray[0] = "NEW  " + covidText[1]
+	textArray[1] = "ALL  " + covidText[0]
 	UTF8text := textArray
 
 	// Draw the text to the background
-	pt := freetype.Pt(2, 2+int(ctx.PointToFixed(utf8FontSizeSmall)>>6))
+	pt := freetype.Pt(2, 2+int(ctx.PointToFixed(utf8FontSize)>>6))
 
 	// not all utf8 fonts are supported by wqy-zenhei.ttf
 	// use your own language true type font file if your language cannot be printed
@@ -438,7 +436,7 @@ func CreateCovidImage(covidText []string) bool {
 			fmt.Println(err)
 			return false
 		}
-		pt.Y += ctx.PointToFixed(utf8FontSizeSmall * spacing)
+		pt.Y += ctx.PointToFixed(utf8FontSize * spacing)
 	}
 
 	// Save
