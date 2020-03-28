@@ -18,7 +18,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/mcuadros/go-rpi-rgb-led-matrix"
 	"github.com/disintegration/imaging"
 	"github.com/golang/freetype"
 	"github.com/golang/freetype/truetype"
