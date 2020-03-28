@@ -18,10 +18,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/mcuadros/go-rpi-rgb-led-matrix"
 	"github.com/disintegration/imaging"
 	"github.com/golang/freetype"
 	"github.com/golang/freetype/truetype"
-	"github.com/mcuadros/go-rpi-rgb-led-matrix"
 	pubnub "github.com/pubnub/go"
 )
 
@@ -273,6 +273,7 @@ func CreateWeatherImage(text []string, iconUrl string) bool {
 	textImage = image.NewRGBA(image.Rect(0, 0, 32, backgroundHeight))
 	draw.Draw(textImage, textImage.Bounds(), fontBackGroundColor, image.ZP, draw.Src)
 
+	utf8FontSize = float64(11.0)
 	ctx = freetype.NewContext()
 	ctx.SetDPI(dpi) //screen resolution in Dots Per Inch
 	ctx.SetFont(utf8Font)
