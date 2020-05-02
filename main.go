@@ -474,7 +474,7 @@ func CreateCovidImage(covidText []string) bool {
 		fatal(err)
 	}
 
-	r2 := image.Rect(10, 0, backgroundWidth, backgroundHeight)
+	r2 := image.Rect(8, 0, backgroundWidth, backgroundHeight)
 	finalImg := image.NewRGBA(image.Rect(0, 0, backgroundWidth, backgroundHeight))
 	draw.Draw(finalImg, src2.Bounds(), src2, image.Point{0, 0}, draw.Src)
 	draw.Draw(finalImg, r2, src, image.Point{0, 0}, draw.Src)
